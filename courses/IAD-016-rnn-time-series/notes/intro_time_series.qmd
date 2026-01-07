@@ -1,0 +1,115 @@
+---
+title: "Introduction to Time Series"
+subtitle: "Recurrent Neural Networks & Time Series — MBA in Artificial Intelligence (USP)"
+author: "Cristiane Millan"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    number_sections: true
+---
+
+## Course Overview
+
+This document contains structured notes based on **Lecture 1 — Introduction to Time Series**, part of the course *Recurrent Neural Networks & Time Series*.
+
+The goal of this lecture is to introduce the **fundamental concepts of time series analysis**, establish notation, and provide context for later discussions on neural networks and sequence modeling.
+
+---
+
+## Course Planning
+
+The course is structured to progressively move from **classical time series concepts** to **modern deep learning approaches** for sequence modeling.
+
+Key components include:
+- Fundamental definitions and terminology
+- Time series properties and challenges
+- Neural network architectures for sequential data
+- Practical applications in forecasting and pattern recognition
+
+---
+
+## What Is a Time Series?
+
+A **time series** is an ordered sequence of observations indexed by time where:
+- observations are collected at regular or irregular time intervals
+- temporal order carries essential information
+- observations are often **not independent**
+
+Examples include:
+- economic indicators (inflation, GDP)
+- sensor measurements
+- network traffic metrics
+- environmental and ecological data
+
+---
+
+## Key Characteristics of Time Series
+
+Time series data present unique challenges when compared to cross-sectional data:
+
+- **Temporal dependence**: observations depend on past values  
+- **Non-stationarity**: statistical properties may change over time  
+- **Seasonality and trends**: recurring patterns at fixed intervals  
+- **Noise and irregularity**: real-world measurements are imperfect  
+
+Understanding these characteristics is essential before applying any modeling technique.
+
+---
+
+## Why Time Series Are Challenging
+
+Traditional machine learning models often assume:
+- independent observations
+- fixed distributions
+
+Time series violate these assumptions, requiring:
+- models that explicitly account for temporal structure
+- careful validation strategies
+- domain-aware preprocessing
+
+This motivates the use of **sequence models**, including recurrent neural networks.
+
+---
+
+## From Classical Methods to Neural Networks
+
+Historically, time series analysis relied on:
+- moving averages
+- autoregressive models
+- ARIMA-family methods
+
+More recent approaches leverage:
+- **Recurrent Neural Networks (RNNs)**
+- **LSTM and GRU architectures**
+- hybrid statistical–neural models
+
+These methods aim to capture **long-range dependencies** and complex temporal patterns.
+
+---
+
+## Bibliography
+
+### Core References
+- Chollet, F. *Deep Learning with Python*. Manning, 2018.  
+- Ganesh, T. V. *Deep Learning from First Principles in Vectorized Python, R and Octave*.  
+- Haykin, S. *Neural Networks: A Comprehensive Foundation*. Bookman, 2nd ed., 2003.
+
+### Complementary References
+- Goodfellow, I., Bengio, Y., Courville, A. *Deep Learning*.  
+- Gulli, A., Sujit, P. *Deep Learning with Keras*. Packt, 2017.
+
+---
+
+## Notes and Next Steps
+
+Future notes will expand on:
+- stationarity and transformations
+- forecasting strategies
+- RNN architectures for time series
+- practical modeling examples
+
+This document will be updated as the course progresses.
+
+
