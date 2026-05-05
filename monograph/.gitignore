@@ -1,0 +1,35 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data
+data/
+
+# Outputs
+figures/
+results/
+models/
+
+# Local configs
+.env
+.env.*
+
+# Temporary files
+*.log
+*.tmp
+
+# Requirements still incomplete
+requirements.txt
