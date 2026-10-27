@@ -16,11 +16,11 @@ O objetivo é avaliar o desempenho preditivo, sobretudo em dias de demanda eleva
 | `02` — Picos | Caracterizar máximos diários, P95 e relação pico/média | Análises principais realizadas |
 | `03` — Frequência | Investigar periodicidades por análise espectral | Análises realizadas |
 | `03a` — Completude | Avaliar a sensibilidade dos indicadores a medições ausentes | Análises realizadas |
-| `04` — Alvos | Consolidar uma tabela diária auditável para previsão | Em implementação/revisão |
+| `04` — Alvos | Consolidar uma tabela diária auditável para previsão | Implementado e validado |
 | `05` — Baselines | Comparar previsões ingênuas e sazonais | Planejado |
 | `06` — Modelos | Treinar e comparar modelos supervisionados | Planejado |
 
-Os estados acima refletem o andamento conhecido do projeto, não uma auditoria de execução de todas as células.
+Os notebooks 00, 01, 02, 03, 03a e 04 foram executados integralmente em kernels limpos independentes na integração temporal de 27/10/2026. Os registros e as comparações estão em `data/backups/rrd_temporal_20261027/verificacao/`. Os notebooks 05 e 06 permanecem planejados.
 
 ## 00 — Preparação dos dados. Como obter uma série temporal consistente?
 
@@ -30,8 +30,11 @@ Os estados acima refletem o andamento conhecido do projeto, não uma auditoria d
 
 - `serie_temporal_filtrada_gbps.csv` — série processada de cinco minutos.
 - `resumo_anual_filtrado_gbps.csv` — resumo anual.
+- `reconstrucao_temporal.metadata.json` — convenções temporais e hashes dos artefatos.
 
-**Atenção:** a completude anual calculada nessa etapa não substitui a auditoria de completude **diária** contra as 288 posições esperadas. A referência de fuso horário dos timestamps ainda precisa ser confirmada.
+**Referência temporal integrada:** `datahora` é o início civil em `America/Sao_Paulo`; `timestamp_inicio` e `timestamp_fim` preservam os instantes UTC. A correção do erro original de −151 segundos preservou os alvos diários de 2023–2025 e as agregações horárias de 2023–2024. A causa, a fórmula e os limites estão na [decisão temporal](DECISOES_RECORTE_TEMPORAL.md#referencia-temporal-dos-intervalos-rrd). O notebook preserva backups permanentes antes de atualizar as saídas oficiais.
+
+**Atenção:** a completude anual calculada nessa etapa não substitui a auditoria de completude **diária** contra as 288 posições esperadas. O início não indica disponibilidade da medição; ela depende do fim e da ingestão.
 
 ## 01 — Análise exploratória do nível de tráfego. Como o tráfego evolui e varia?
 
@@ -77,14 +80,14 @@ Na análise horária, foram utilizados critérios próprios de completude e inte
 
 **Escopo mínimo:**
 
-- [ ] Construir uma linha por dia em 2023–2024, mantendo o calendário completo.
-- [ ] Calcular **máximo** e **P95** (alvos principais), **P99** e **média** (complementares), diretamente das observações de cinco minutos, sem interpolação.
-- [ ] Usar quantis lineares (`numpy.quantile(method="linear")`).
-- [ ] Registrar contagem, completude, lacunas, duplicatas e diagnósticos dos extremos.
-- [ ] Distinguir **indicador observado** de **alvo elegível** (mínimo de 260 observações válidas).
-- [ ] Documentar empates, limites do dia e referência temporal; não presumir fuso horário.
-- [ ] Validar disponibilidade por mês/ano e coerência dos indicadores com poucas tabelas.
-- [ ] Exportar o dataset de forma que o notebook 05 possa carregá-lo independentemente.
+- [x] Construir uma linha por dia em 2023–2024, mantendo o calendário completo.
+- [x] Calcular **máximo** e **P95** (alvos principais), **P99** e **média** (complementares), diretamente das observações de cinco minutos, sem interpolação.
+- [x] Usar quantis lineares (`numpy.quantile(method="linear")`).
+- [x] Registrar contagem, completude, lacunas, duplicatas e diagnósticos dos extremos.
+- [x] Distinguir **indicador observado** de **alvo elegível** (mínimo de 260 observações válidas).
+- [x] Documentar empates, limites do dia e referência temporal derivada dos epochs UTC.
+- [x] Validar disponibilidade por mês/ano e coerência dos indicadores com poucas tabelas.
+- [x] Exportar o dataset de forma que o notebook 05 possa carregá-lo independentemente.
 
 A investigação detalhada do **horário do máximo** é secundária e não deve bloquear os modelos de magnitude. Não é necessário refazer gráficos históricos, análise espectral ou simulações de incompletude.
 
@@ -123,9 +126,10 @@ Assim, o TCC **não definirá tolerâncias operacionais arbitrárias nem capacid
 
 ## Pendências metodológicas prioritárias
 
-- [ ] Confirmar a referência temporal/fuso dos timestamps e o significado dos limites de cada dia.
-- [ ] Finalizar e validar o dataset diário do notebook 04.
-- [ ] Documentar o tratamento operacional de duplicatas e empates.
+- [x] Confirmar a referência temporal/fuso dos timestamps e o significado dos limites de cada dia.
+- [x] Finalizar e validar o dataset diário do notebook 04.
+- [x] Documentar o tratamento de duplicatas e empates no dataset diário.
+- [ ] Fixar a hora operacional da origem de previsão e a latência de ingestão, respeitando o fim dos intervalos.
 - [ ] Verificar as datas elegíveis e a continuidade do calendário antes de construir defasagens.
 - [ ] Decidir se vale comparar treinamento restrito a 2023 com histórico mais longo, após os primeiros baselines.
 

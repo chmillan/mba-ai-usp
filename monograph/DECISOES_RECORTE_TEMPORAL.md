@@ -6,6 +6,73 @@ O objetivo principal do TCC é desenvolver e avaliar um **modelo de previsão da
 
 A investigação de anomalias é complementar: se viável, identificar observações inadequadas para o treinamento e avaliar seu tratamento. Construir um detector de anomalias não é requisito para concluir o trabalho.
 
+<a id="referencia-temporal-dos-intervalos-rrd"></a>
+
+## Referência temporal dos intervalos RRD
+
+A correção temporal foi integrada e validada em 27/10/2026. A primeira RRA do
+XML é `AVERAGE`, com `step=300` e `pdp_per_row=1`. O epoch de cada linha
+representa o fim exclusivo do intervalo consolidado, não seu início nem um
+máximo instantâneo. Os indicadores de demanda usam a soma de entrada e saída
+desses valores consolidados de cinco minutos.
+
+A reconstrução anterior usava `lastupdate - n * step + i * step`.
+Como `lastupdate % 300 = 149` e existem `n - 1` intervalos entre a primeira
+e a última linha, o erro em relação ao fim era `149 - 300 = -151` segundos.
+A reconstrução correta, para índices iniciados em zero, é:
+
+```python
+intervalo = step * pdp_per_row
+ultimo_fim = lastupdate - lastupdate % intervalo
+primeiro_fim = ultimo_fim - (n - 1) * intervalo
+timestamp_fim = primeiro_fim + i * intervalo
+timestamp_inicio = timestamp_fim - intervalo
+```
+
+Os epochs são a referência primária; o notebook 00 confere todas as
+2.100.154 linhas da primeira RRA contra os epochs dos comentários do XML.
+`timestamp_inicio` e `timestamp_fim` são preservados em UTC com fuso explícito.
+Para atribuir demanda aos dias civis, usa-se o início convertido para
+`America/Sao_Paulo`. Assim, o intervalo `[23:55, 00:00)` pertence ao dia
+anterior à meia-noite de encerramento.
+
+Por compatibilidade com os notebooks analíticos, `datahora` contém esse
+início civil sem fuso. Ela é referência de agregação, não chave inequívoca
+de instante. Há 144 referências civis repetidas no histórico em transições
+de horário de verão; os instantes UTC não se repetem. Os horários civis
+textuais dos comentários do XML não são adotados como fonte primária:
+434.000 deles divergem da conversão dos epochs por `America/Sao_Paulo`.
+No recorte 2023–2025, a referência civil é UTC−03:00, sem essas transições.
+
+Em relação ao CSV anterior, o fim correto avança 151 segundos e o início
+civil recua 149 segundos. Essa alteração preservou a atribuição dos registros
+aos dias e às horas. A comparação antes/depois confirmou:
+
+| Período | Resultado da integração |
+|---|---|
+| 2023 | Contagens, máximo, P95, P99 e média diária idênticos; 362 dias elegíveis. |
+| 2024 | Contagens, máximo, P95, P99 e média diária idênticos; 347 dias elegíveis. |
+| 2025 | Mesmos indicadores idênticos; 365 dias elegíveis. Verificação de integridade, sem seleção metodológica. |
+| 2023–2024 horário | Agregações, cobertura e elegibilidade horária idênticas. |
+
+Os valores de tráfego, o filtro anual, os critérios de completude e a
+interpolação permaneceram inalterados. Os campos auxiliares de horário dos
+máximos na tabela diária passaram a referenciar o início correto na grade
+de cinco minutos; os alvos numéricos e suas máscaras permaneceram iguais.
+
+O início do intervalo **não é o instante de disponibilidade**. A medição
+somente pode estar disponível após o fim e a ingestão. Ainda será necessário
+fixar a hora operacional da origem de previsão e a latência admitida antes
+de construir atributos. A correção não altera treino, validação ou teste.
+
+Os backups anteriores, os candidatos corrigidos, os hashes SHA-256 e os
+registros de execução estão em `data/backups/rrd_temporal_20261027/`.
+Os notebooks 00, 01, 02, 03, 03a e 04 foram efetivamente executados em kernels
+limpos independentes. No 03, foram restauradas as definições ausentes de
+`series_anuais` e `interpolar_lacunas_curtas`, mantendo as regras documentadas;
+as 16 tabelas numéricas anteriores foram reproduzidas. Novas execuções de 00
+e 04 preservam os artefatos substituídos em backups permanentes.
+
 ## Recorte inicial adotado
 
 Manter **1º de janeiro de 2023** como início do treinamento na estratégia principal, com a seguinte divisão cronológica:
