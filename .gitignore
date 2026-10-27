@@ -209,3 +209,5 @@ __marimo__/
 # Quarto outputs
 *.html
 *_files/
+
+.DS_Store
